@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flash Quote Poster</title>
+  <style>
+    :root{
+      --bg1:#0f172a;
+      --bg2:#0b1220;
+      --accent:#7c5cff;
+      --accent2:#3dd0ff;
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.72);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      padding:24px;
+    }
+
+    .poster{
+      width:min(1100px, 95vw);
+      aspect-ratio:16/9;
+      border-radius:18px;
+      overflow:hidden;
+      position:relative;
+      background: radial-gradient(900px 420px at 10% 20%, rgba(124,92,255,.35), transparent 60%),
+                  radial-gradient(700px 420px at 90% 70%, rgba(61,208,255,.25), transparent 55%),
+                  linear-gradient(135deg, #0b1026, #162a6b);
+      box-shadow:0 22px 80px rgba(0,0,0,.45);
+    }
+
+    .poster::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:linear-gradient(90deg, rgba(124,92,255,.35), rgba(61,208,255,.25), rgba(124,92,255,.35));
+      opacity:.35;
+      pointer-events:none;
+      transform:translateX(-35%);
+      animation:sheen 3.6s ease-in-out infinite;
+    }
+    @keyframes sheen{
+      0%,100%{ transform:translateX(-35%); opacity:.28 }
+      50%{ transform:translateX(35%); opacity:.55 }
+    }
+
+    .layout{
+      position:absolute; inset:0;
+      display:grid;
+      grid-template-columns: 1.05fr .85fr;
+      gap:22px;
+      padding:28px;
+    }
+
+    @media (max-width: 860px){
+      .layout{ grid-template-columns: 1fr; }
+      .poster{ aspect-ratio: 9/16; }
+    }
+
+    .left{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      padding:10px 6px;
+      z-index:1;
+    }
+
+    .topline{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .flashBadge{
+      width:66px;height:66px;
+      border-radius:20px;
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg, rgba(124,92,255,.45), rgba(61,208,255,.28));
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 18px 46px rgba(124,92,255,.18);
+      position:relative;
+      overflow:hidden;
+    }
+    .flashBadge svg{ width:42px;height:42px; filter:drop-shadow(0 10px 18px rgba(0,0,0,.25)); }
+
+    .flashTitle{
+      font-weight:900;
+      letter-spacing:.3px;
+      font-size:22px;
+      color:rgba(255,255,255,.95);
+      text-shadow:0 18px 45px rgba(124,92,255,.35);
+      line-height:1.1;
+    }
+    .flashTitle small{
+      display:block;
+      font-size:12px;
+      letter-spacing:.2px;
+      color:var(--muted);
+      margin-top:4px;
+      font-weight:700;
+    }
+
+    .quoteBlock{
+      margin-top:10px;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding:6px 0;
+    }
+
+    .quoteText{
+      font-size: clamp(28px, 2.6vw, 46px);
+      line-height:1.15;
+      font-weight:900;
+      color:rgba(255,255,255,.96);
+      text-shadow:0 16px 50px rgba(0,0,0,.35);
+      margin:0;
+      letter-spacing:.2px;
+      cursor:pointer;
+    }
+
+    .quoteBy{
+      margin-top:14px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:rgba(234,240,255,.86);
+      font-weight:700;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background:linear-gradient(135deg, #7c5cff, #3dd0ff);
+      box-shadow:0 10px 30px rgba(124,92,255,.35);
+    }
+
+    .right{
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      align-items:stretch;
+      padding:12px 8px;
+    }
+
+    .sideCard{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      height:100%;
+    }
+
+    .sideCard h3{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+      color:rgba(234,240,255,.78);
+      font-weight:800;
+      text-transform:uppercase;
+    }
+
+    .cartoonWrap{
+      flex:1;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      position:relative;
+      min-height: 220px;
+    }
+    .cartoonWrap img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter:saturate(115%) contrast(105%);
+    }
+    .cartoonWrap::after{
+      content:"";
+      position:absolute; inset:0;
+      background:linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.25));
+      pointer-events:none;
+    }
+
+    .uploadHint{
+      font-size:12px;
+      color:rgba(234,240,255,.70);
+      line-height:1.4;
+    }
+
+    .actions{
+      position:absolute;
+      left:22px;
+      bottom:18px;
+      display:flex;
+      gap:10px;
+      z-index:2;
+      flex-wrap:wrap;
+    }
+
+    @media (max-width: 860px){
+      .actions{
+        position: static;
+        margin-top:16px;
+        padding:0 8px 10px;
+      }
+      button{ padding:9px 12px; }
+    }
+
+    @media (max-width: 420px){
+      body{ padding:16px; }
+      .layout{ padding:18px 14px; gap:14px; }
+      .poster{ border-radius:14px; }
+      .actions{ margin-top:12px; gap:8px; padding:0 4px 8px; }
+      button{ padding:8px 10px; font-size:13px; }
+    }
+
+    button{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.92);
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+      backdrop-filter: blur(10px);
+    }
+    button:hover{ filter:brightness(1.05); }
+  </style>
+</head>
+<body>
+
+  <div class="poster" id="poster">
+    <div class="layout">
+      <section class="left">
+        <div class="topline">
+          <div class="flashBadge" aria-label="Flash logo">
+            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img">
+              <defs>
+                <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#7c5cff"/>
+                  <stop offset="1" stop-color="#3dd0ff"/>
+                </linearGradient>
+              </defs>
+              <path fill="url(#lg)" d="M36 2L8 38h20l-4 24 32-40H36l0-20z"/>
+            </svg>
+          </div>
+
+          <div class="flashTitle">
+            Quotes by Flash
+            <small>Speed • Mindset • Inspiration</small>
+          </div>
+        </div>
+
+        <div class="quoteBlock">
+          <p class="quoteText" id="quote">“The only way to do great work is to love what you do.”</p>
+          <div class="quoteBy">
+            <span class="dot" aria-hidden="true"></span>
+            <span id="author">— Steve Jobs</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right">
+        <div class="sideCard">
+          <div class="cartoonWrap">
+            <img
+              id="cartoonImg"
+              crossorigin="anonymous"
+              src="https://media.istockphoto.com/id/1329980413/vector/the-boy-in-gray-is-using-a-smartphone.jpg?s=612x612&w=0&k=20&c=QpHk6b6JflhIFVBkG46Z1LRdpPfeJZmTq5FoOp0SVEQ="
+              alt="(Poster pe click karoge to quote change hoga.)"
+            />
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="actions">
+      <button id="prevBtn" type="button">Previous</button>
+      <button id="nextBtn" type="button">Next</button>
+
+      <button id="downloadBtn" type="button">Download</button>
+      <button id="copyBtn" type="button">Copy</button>
+      <button id="tweetBtn" type="button">Tweet</button>
+      <button id="likeBtn" type="button" aria-pressed="false">Like ❤️</button>
+      <span id="likeCount" style="align-self:center; font-weight:900; color:rgba(255,255,255,.92); padding:0 2px;">0</span>
+    </div>
+  </div>
+
+  <script>
+    const poster = document.getElementById('poster');
+    const quoteEl = document.getElementById('quote');
+    const authorEl = document.getElementById('author');
+
+    // NOTE: Previous version had missing commas between objects in QUOTES.
+    // That caused a JS syntax error, so click/copy/like actions were not working.
+    const QUOTES = [
+      { q: '“Success is not final; failure is not fatal: it is the courage to continue that counts.”', a: '— Winston Churchill' },
+      { q: "“Life is what happens when you're busy making other plans.”", a: '— John Lennon' },
+      { q: "“It always seems impossible until it's done.”", a: '— Nelson Mandela' },
+      { q: "“You miss 100% of the shots you don't take.”", a: '— Wayne Gretzky' },
+      { q: "“Whether you think you can or you think you can't, you're right.”", a: '— Henry Ford' },
+
+      { q: "“Innovation distinguishes between a leader and a follower..”", a: '— Steve jobs' },
+      { q: "“Turning ideas into reality through technology.”", a: '— Henry For' },
+      { q: "“Code. Create. Innovate”", a: '— Ayush Barnwal' },
+      { q: "“Every great achievement starts with a single step.”", a: '— Lao Tzu' },
+      { q: "“Building solutions for a smarter future.”", a: '— flash' },
+      { q: "“Learning today, leading tomorrow.”", a: '— Ayush Barnwal' },
+      { q: "“Empowering growth through knowledge and innovation.”", a: '— Alan Kay' },
+      { q: "“Any sufficiently advanced technology is indistinguishable from magic..”", a: '— Cke' },
+      { q: "“he best way to predict the future is to invent it.”", a: '— Alan Kay' },
+
+      { q: "“Design, Develop, Deliver..”", a: '— Henry Ford' }
+    ];
+
+    let currentIndex = 0;
+
+    function showQuote(index){
+      const pick = QUOTES[index];
+      quoteEl.textContent = pick.q;
+      authorEl.textContent = pick.a;
+      hardPulse();
+    }
+
+    function nextQuote(){
+      currentIndex = (currentIndex + 1) % QUOTES.length;
+      showQuote(currentIndex);
+    }
+
+    function prevQuote(){
+      currentIndex = (currentIndex - 1 + QUOTES.length) % QUOTES.length;
+      showQuote(currentIndex);
+    }
+
+    // Initial quote from array (instead of the hardcoded default text)
+    showQuote(currentIndex);
+
+    quoteEl.addEventListener('click', () => {
+      nextQuote();
+    });
+
+    function toast(msg){
+      let t = document.getElementById('toast');
+
+      if(!t){
+        t = document.createElement('div');
+        t.id = 'toast';
+        t.style.position='fixed';
+        t.style.left='50%';
+        t.style.bottom='18px';
+        t.style.transform='translateX(-50%)';
+        t.style.background='rgba(10,15,35,.78)';
+        t.style.color='white';
+        t.style.border='1px solid rgba(255,255,255,.14)';
+        t.style.padding='10px 14px';
+        t.style.borderRadius='12px';
+        t.style.boxShadow='0 18px 60px rgba(0,0,0,.45)';
+        t.style.opacity='0';
+        t.style.pointerEvents='none';
+        t.style.zIndex='999';
+        t.style.backdropFilter='blur(12px)';
+        t.style.transition='opacity .18s ease, transform .18s ease';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.style.opacity='1';
+      t.style.transform='translateX(-50%) translateY(-6px)';
+      clearTimeout(toast._t);
+      toast._t = setTimeout(()=>{
+        t.style.opacity='0';
+        t.style.transform='translateX(-50%) translateY(0)';
+      }, 1600);
+    }
+
+    async function copyQuote(){
+      const payload = `${quoteEl.textContent} ${authorEl.textContent}`.replace(/\s+/g,' ').trim();
+      try{
+        await navigator.clipboard.writeText(payload);
+        toast('Quote copied ✅');
+      }catch(e){
+        toast('Copy failed ❌');
+      }
+    }
+
+    function tweetQuote(){
+      const payload = `${quoteEl.textContent} ${authorEl.textContent}`.replace(/\s+/g,' ').trim();
+      const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(payload);
+      window.open(url,'_blank');
+    }
+
+    let liked = false;
+    let likeCount = 0;
+    function toggleLike(btn){
+      btn.style.transition = 'transform .12s ease, filter .12s ease';
+      btn.style.filter = liked ? '' : 'drop-shadow(0 14px 30px rgba(247,164,0,.25))';
+      liked = !liked;
+      likeCount = liked ? likeCount + 1 : Math.max(0, likeCount - 1);
+      if(liked){
+        btn.setAttribute('aria-pressed','true');
+        btn.animate([{transform:'scale(.98)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(.2,.9,.2,1)'});
+        toast('Liked ❤️');
+      }else{
+        btn.setAttribute('aria-pressed','false');
+        toast('Like removed');
+      }
+      document.getElementById('likeCount').textContent = String(likeCount);
+    }
+
+    function glow(){
+      poster.animate([
+        {filter:'brightness(1)', transform:'translateY(0)'},
+        {filter:'brightness(1.08)', transform:'translateY(-2px)'},
+        {filter:'brightness(1)', transform:'translateY(0)'}
+      ],{duration:480,easing:'cubic-bezier(.2,.9,.2,1)'});
+    }
+
+    function hardPulse(){
+      const flashBadge = document.querySelector('.flashBadge');
+      if(flashBadge){
+        flashBadge.animate([
+          {transform:'translateY(0) scale(1)'},
+          {transform:'translateY(-4px) scale(1.08) rotate(-3deg)'},
+          {transform:'translateY(1px) scale(.98) rotate(2deg)'},
+          {transform:'translateY(0) scale(1)'}
+        ],{duration:520,easing:'cubic-bezier(.2,.9,.2,1)'});
+      }
+
+      quoteEl.animate([
+        {transform:'translateY(-8px) rotate(-1deg) scale(.99)', filter:'blur(8px)', opacity:.2},
+        {transform:'translateY(2px) rotate(.4deg) scale(1.01)', filter:'blur(2px)', opacity:1, offset:0.6},
+        {transform:'translateY(0) rotate(0deg) scale(1)', filter:'blur(0)', opacity:1}
+      ],{duration:420,easing:'cubic-bezier(.2,.9,.2,1)'});
+
+      authorEl.animate([
+        {opacity:.4, transform:'translateY(6px)'},
+        {opacity:1, transform:'translateY(0)'}
+      ],{duration:260,easing:'ease-out'});
+
+      glow();
+    }
+
+    // Initial pulse
+    hardPulse();
+
+    // Local fallback image (data URI) to avoid remote-image CORS breaking downloads.
+    // Simple gradient SVG keeps poster look consistent even if remote image can't be rendered.
+    const LOCAL_CARTOON_DATA_URI =
+      'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#7c5cff" stop-opacity="0.95"/>
+              <stop offset="1" stop-color="#3dd0ff" stop-opacity="0.95"/>
+            </linearGradient>
+            <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity="0.35"/>
+            </filter>
+          </defs>
+          <rect width="600" height="600" fill="#0b1220"/>
+          <circle cx="140" cy="160" r="190" fill="url(#g)" opacity="0.25"/>
+          <circle cx="470" cy="460" r="220" fill="url(#g)" opacity="0.22"/>
+          <g filter="url(#s)">
+            <rect x="170" y="120" width="260" height="360" rx="40" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
+            <rect x="215" y="170" width="170" height="250" rx="22" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.16)"/>
+            <circle cx="280" cy="300" r="64" fill="rgba(61,208,255,0.18)"/>
+            <path d="M242 355 C260 330 300 328 328 350" fill="none" stroke="rgba(124,92,255,0.55)" stroke-width="10" stroke-linecap="round"/>
+          </g>
+          <text x="300" y="560" text-anchor="middle" font-family="system-ui,Segoe UI,Roboto,Arial" font-weight="800" font-size="26" fill="rgba(255,255,255,0.75)">Flash</text>
+        </svg>
+      `);
+
+    async function downloadPoster(){
+      const posterEl = document.getElementById('poster');
+      const cartoonImg = document.getElementById('cartoonImg');
+
+      const renderToCanvas = async ({forceLocalCartoon} = {}) => {
+        const clone = posterEl.cloneNode(true);
+        clone.style.position = 'fixed';
+        clone.style.left = '-10000px';
+        clone.style.top = '0';
+        clone.style.width = posterEl.getBoundingClientRect().width + 'px';
+        clone.style.height = posterEl.getBoundingClientRect().height + 'px';
+        clone.style.pointerEvents = 'none';
+        document.body.appendChild(clone);
+
+        // Optionally replace the cartoon image with local data URI (guaranteed safe for canvas).
+        if(forceLocalCartoon){
+          const cloneCartoon = clone.querySelector('#cartoonImg');
+          if(cloneCartoon){
+            cloneCartoon.src = LOCAL_CARTOON_DATA_URI;
+            cloneCartoon.removeAttribute('crossorigin');
+          }
+        }
+
+        await new Promise(r => requestAnimationFrame(() => r()));
+
+        const w = Math.round(posterEl.getBoundingClientRect().width);
+        const h = Math.round(posterEl.getBoundingClientRect().height);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+
+        const serializer = new XMLSerializer();
+
+        // Wait for images inside clone to load
+        const imgs = Array.from(clone.querySelectorAll('img'));
+        await Promise.all(imgs.map(img => {
+          return new Promise(resolve => {
+            if(img.complete && img.naturalWidth > 0) return resolve();
+            img.addEventListener('load', () => resolve(), {once:true});
+            img.addEventListener('error', () => resolve(), {once:true});
+          });
+        }));
+
+        const svg = `<?xml version="1.0" encoding="UTF-8"?>
+          <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+            <foreignObject x="0" y="0" width="100%" height="100%">
+              <div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;height:${h}px;">
+                ${serializer.serializeToString(clone)}
+              </div>
+            </foreignObject>
+          </svg>`;
+
+        const svgBlob = new Blob([svg], {type: 'image/svg+xml;charset=utf-8'});
+        const url = URL.createObjectURL(svgBlob);
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        await new Promise((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = (e) => reject(e);
+          img.src = url;
+        });
+
+        ctx.fillStyle = '#0b1220';
+        ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img, 0, 0, w, h);
+
+        URL.revokeObjectURL(url);
+        clone.remove();
+
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        if(!blob) throw new Error('Failed to create image blob');
+        return blob;
+      };
+
+      try{
+        toast('Preparing Download…');
+
+        // 1) Try using the current (remote) cartoon image.
+        let blob = await renderToCanvas({forceLocalCartoon:false});
+
+        const a = document.createElement('a');
+        const filename = 'flash-quote-poster.png';
+        const dlUrl = URL.createObjectURL(blob);
+        a.href = dlUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(dlUrl), 1500);
+
+        toast('Downloaded ✅');
+      }catch(err){
+        console.error('Download error (remote image):', err);
+
+        // 2) Guaranteed fallback: replace remote image with local data URI and retry.
+        try{
+          toast('Remote image blocked. Using safe download…');
+          const blob = await renderToCanvas({forceLocalCartoon:true});
+
+          const a = document.createElement('a');
+          const filename = 'flash-quote-poster.png';
+          const dlUrl = URL.createObjectURL(blob);
+          a.href = dlUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(dlUrl), 1500);
+
+          toast('Downloaded ✅ (fallback image)');
+        }catch(err2){
+          console.error('Download error (fallback image):', err2);
+          toast('Download Processing ✅ ');
+          setTimeout(() => {
+            try{ window.print(); }catch(e){}
+          }, 250);
+        }
+      }
+    }
+
+
+
+    document.getElementById('prevBtn').addEventListener('click', prevQuote);
+    document.getElementById('nextBtn').addEventListener('click', nextQuote);
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      downloadPoster();
+    });
+
+
+    document.getElementById('copyBtn').addEventListener('click', copyQuote);
+    document.getElementById('tweetBtn').addEventListener('click', tweetQuote);
+    document.getElementById('likeBtn').addEventListener('click', (e)=>toggleLike(e.currentTarget));
+  </script>
+</body>
+</html>
+
